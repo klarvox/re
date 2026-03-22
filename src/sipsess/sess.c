@@ -115,7 +115,8 @@ static bool terminate(struct sipsess *sess)
 	if (!sess->established || sess->peerterm)
 		return false;
 
-	if (sipsess_bye(sess, true))
+	int err = sipsess_bye(sess, true);
+	if (err)
 		return false;
 
 	mem_ref(sess);
