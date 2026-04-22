@@ -1356,6 +1356,34 @@ int sip_transp_add_sock(struct sip *sip, enum sip_transp tp,
 
 
 /**
+ * Get the UDP socket for a given SIP stack. Returns the first UDP
+ * transport's underlying struct udp_sock *, or NULL if no UDP transport
+ * has been added. Added for Android VPN support — callers need the
+ * raw fd (via udp_sock_fd) to bind the socket to a specific Network
+ * via android_setsocknetwork().
+ *
+ * @param sip   SIP stack instance
+ *
+ * @return UDP socket pointer, or NULL
+ */
+struct udp_sock *sip_transp_udp_sock(struct sip *sip)
+{
+	struct le *le;
+
+	if (!sip)
+		return NULL;
+
+	for (le = sip->transpl.head; le; le = le->next) {
+		struct sip_transport *transp = le->data;
+		if (transp->tp == SIP_TRANSP_UDP)
+			return (struct udp_sock *)transp->sock;
+	}
+
+	return NULL;
+}
+
+
+/**
  * Add a SIP websocket transport
  *
  * @param sip    SIP stack instance
